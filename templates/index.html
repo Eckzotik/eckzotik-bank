@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eckzotik Bank</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="theme-blue">
+  <div id="authScreen" class="screen auth-screen">
+    <div class="auth-box glass">
+      <h1>Eckzotik Bank</h1>
+
+      <div class="tabs">
+        <button id="loginTabBtn" class="tab active" onclick="switchAuthTab('login')">Вход</button>
+        <button id="registerTabBtn" class="tab" onclick="switchAuthTab('register')">Регистрация</button>
+      </div>
+
+      <div id="loginTab" class="tab-content active">
+        <input id="loginUsername" class="input" placeholder="Username">
+        <input id="loginPassword" class="input" type="password" placeholder="Пароль">
+        <button class="btn primary" onclick="login()">Войти</button>
+      </div>
+
+      <div id="registerTab" class="tab-content">
+        <input id="registerDisplayName" class="input" placeholder="Имя профиля">
+        <input id="registerUsername" class="input" placeholder="Уникальный username">
+        <input id="registerPhone" class="input" placeholder="Номер телефона">
+        <input id="registerPassword" class="input" type="password" placeholder="Пароль">
+        <input id="registerReferral" class="input" placeholder="Реферальный код (необязательно)">
+        <button class="btn primary" onclick="registerUser()">Создать аккаунт</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appScreen" class="screen hidden">
+    <header class="topbar">
+      <div class="top-user">
+        <div id="avatarMini" class="avatar">E</div>
+        <div>
+          <div class="muted">Привет</div>
+          <div id="topDisplayName" class="top-name">User</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" onclick="openSection('profileSection')">👤</button>
+        <button class="icon-btn" onclick="openSection('settingsSection')">⚙️</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div id="mainBalance" class="main-balance">0 ₴</div>
+      <div class="muted center">Главная карта</div>
+    </section>
+
+    <section class="cards-wrap glass">
+      <div class="section-head">
+        <h2>Карты</h2>
+        <button class="mini-btn" onclick="openSection('createCardSection')">+ карта</button>
+      </div>
+      <div class="muted">Максимум карт: <span id="maxCardsInfo">5</span></div>
+      <div id="cardsList" class="cards-list"></div>
+    </section>
+
+    <section class="quick-grid">
+      <button class="quick-btn" onclick="openSection('transferSection')">💸 Перевод</button>
+      <button class="quick-btn" onclick="openSection('contactsSection')">📇 Контакты</button>
+      <button class="quick-btn" onclick="openSection('profileSection')">👤 Профиль</button>
+      <button class="quick-btn" onclick="openSection('settingsSection')">⚙️ Настройки</button>
+      <button class="quick-btn" onclick="openSection('moreSection')">➕ Ещё</button>
+      <button class="quick-btn" onclick="refreshAll()">🔄 Обновить</button>
+    </section>
+
+    <section class="operations glass">
+      <div class="section-head">
+        <h2>История</h2>
+      </div>
+      <div id="historyList"></div>
+    </section>
+
+    <section id="transferSection" class="panel hidden glass">
+      <h3>Перевод карта → карта</h3>
+
+      <label class="label">С какой карты</label>
+      <select id="fromCardSelect" class="input dark"></select>
+
+      <label class="label">На номер карты</label>
+      <input id="targetCardNumber" class="input dark" placeholder="1111 2222 3333 4444">
+
+      <label class="label">Сумма</label>
+      <input id="transferAmount" class="input dark" placeholder="100">
+
+      <button class="btn primary" onclick="sendCardTransfer()">Отправить</button>
+    </section>
+
+    <section id="contactsSection" class="panel hidden glass">
+      <h3>Мои контакты</h3>
+
+      <input id="contactName" class="input dark" placeholder="Имя контакта">
+      <input id="contactUsername" class="input dark" placeholder="Username (необязательно)">
+      <input id="contactCard" class="input dark" placeholder="Карта (необязательно)">
+      <button class="btn primary" onclick="addContact()">Добавить контакт</button>
+
+      <div id="contactsList" class="contacts-list"></div>
+    </section>
+
+    <section id="createCardSection" class="panel hidden glass">
+      <h3>Открыть новую карту</h3>
+
+      <input id="newCardName" class="input dark" placeholder="Название карты">
+
+      <label class="label">Валюта</label>
+      <select id="newCardCurrency" class="input dark">
+        <option value="UAH">UAH</option>
+        <option value="USD">USD</option>
+        <option value="EUR">EUR</option>
+        <option value="PLN">PLN</option>
+      </select>
+
+      <label class="label">Тип карты</label>
+      <select id="newCardType" class="input dark">
+        <option value="adult">Взрослая</option>
+        <option value="child">Детская</option>
+      </select>
+
+      <label class="label">Скин карты</label>
+      <select id="newCardSkin" class="input dark">
+        <option value="obsidian">Obsidian</option>
+        <option value="aurora">Aurora</option>
+        <option value="sunset">Sunset</option>
+        <option value="violet">Violet</option>
+        <option value="ocean">Ocean</option>
+        <option value="emerald">Emerald</option>
+      </select>
+
+      <button class="btn primary" onclick="createCard()">Создать карту</button>
+      <div class="muted">При открытии любой карты начисляется эквивалент 1000 грн в выбранной валюте.</div>
+    </section>
+
+    <section id="profileSection" class="panel hidden glass">
+      <h3>Профиль</h3>
+
+      <input id="profileDisplayName" class="input dark" placeholder="Имя профиля">
+      <input id="profileAvatarColor" class="input dark" placeholder="#4f46e5">
+
+      <label class="label">Выбрать аватар</label>
+      <div id="presetAvatarList" class="preset-avatars"></div>
+
+      <label class="label">Или загрузить свой</label>
+      <input id="avatarUpload" class="input dark" type="file" accept="image/*">
+
+      <div class="profile-info">
+        <div><span>Username:</span> <b id="profileUsername">-</b></div>
+        <div><span>Телефон:</span> <b id="profilePhone">-</b></div>
+        <div><span>Реф-код:</span> <b id="profileReferral">-</b></div>
+      </div>
+
+      <button class="btn primary" onclick="saveProfile()">Сохранить профиль</button>
+    </section>
+
+    <section id="settingsSection" class="panel hidden glass">
+      <h3>Настройки</h3>
+
+      <label class="label">Тема</label>
+      <div class="theme-row">
+        <button class="theme-dot blue" onclick="pickTheme('blue')"></button>
+        <button class="theme-dot purple" onclick="pickTheme('purple')"></button>
+        <button class="theme-dot green" onclick="pickTheme('green')"></button>
+        <button class="theme-dot gold" onclick="pickTheme('gold')"></button>
+      </div>
+
+      <label class="label">Язык</label>
+      <select id="languageSelect" class="input dark">
+        <option value="ru">Русский</option>
+        <option value="uk">Українська</option>
+        <option value="en">English</option>
+      </select>
+
+      <button class="btn primary" onclick="saveSettings()">Сохранить настройки</button>
+      <button class="btn ghost" onclick="logout()">Выйти</button>
+    </section>
+
+    <section id="moreSection" class="panel hidden glass">
+      <h3>Ещё</h3>
+
+      <div class="support-card">
+        <h4>Поддержка</h4>
+        <div>Telegram: <b>@tegECKZOTIK_org</b></div>
+        <div>Телефон: <b>+380 (68) 623 70 84</b></div>
+      </div>
+
+      <div class="fine-card">
+        <h4>Погашение штрафов</h4>
+        <label class="label">Карта</label>
+        <select id="fineCardSelect" class="input dark"></select>
+        <input id="fineReason" class="input dark" placeholder="Причина штрафа">
+        <input id="fineAmount" class="input dark" placeholder="Сумма штрафа">
+        <button class="btn primary" onclick="payFine()">Оплатить штраф</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
